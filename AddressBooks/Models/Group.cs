@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AddressBooks
+namespace AddressBooks.Models
 {
     public class Group
     {
@@ -17,5 +17,8 @@ namespace AddressBooks
 
         [JsonProperty("address_book")]
         private int AddressBookId;
+
+        [JsonProperty("ignore")]
+        public List<Address> Addresses;
     }
 }

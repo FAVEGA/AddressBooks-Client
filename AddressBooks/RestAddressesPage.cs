@@ -8,7 +8,7 @@ using AddressBooks.Models;
 
 namespace AddressBooks
 {
-    public class RestAddressBookPage
+    public class RestAddressesPage
     {
         [JsonProperty("count")]
         public int Count { get; set; }
@@ -20,6 +20,7 @@ namespace AddressBooks
         public string Previous { get; set; }
 
         [JsonProperty("results")]
-        public List<AddressBook> Results;
+        public List<Address> Results;
     }
 }
+

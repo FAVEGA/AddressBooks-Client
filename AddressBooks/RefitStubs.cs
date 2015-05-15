@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
+using AddressBooks.Models;
 using Refit;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +79,18 @@ namespace AddressBooks
         {
             var arguments = new object[] { id,authorization };
             return (Task<Group>) methodImpls["GetGroup"](Client, arguments);
+        }
+
+        public virtual Task<RestGroupsPage> GetGroupsForAddressBook(int addressBook,int page,string authorization)
+        {
+            var arguments = new object[] { addressBook,page,authorization };
+            return (Task<RestGroupsPage>) methodImpls["GetGroupsForAddressBook"](Client, arguments);
+        }
+
+        public virtual Task<RestAddressesPage> GetAddressesForGroup(int group,int page,string authorization)
+        {
+            var arguments = new object[] { group,page,authorization };
+            return (Task<RestAddressesPage>) methodImpls["GetAddressesForGroup"](Client, arguments);
         }
 
     }

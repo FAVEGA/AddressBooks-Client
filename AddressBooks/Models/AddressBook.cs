@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AddressBooks
+namespace AddressBooks.Models
 {
 
     public class AddressBook
@@ -34,6 +34,11 @@ namespace AddressBooks
                 return ((AddressBook) obj).Id == this.Id;
             }
             return base.Equals(obj);
+        }
+
+        public override string ToString()
+        {
+            return this.Name;
         }
     }
 }

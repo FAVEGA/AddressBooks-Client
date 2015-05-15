@@ -65,18 +65,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AddressBook.cs" />
+    <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\AddressBook.cs" />
     <Compile Include="RestAddressBookPage.cs" />
-    <Compile Include="Group.cs" />
+    <Compile Include="Models\Group.cs" />
     <Compile Include="IAddressBookApi.cs" />
+    <Compile Include="RestAddressesPage.cs" />
     <Compile Include="RestApi.cs" />
     <Compile Include="RefitStubs.cs" />
-    <Compile Include="User.cs" />
-    <Page Include="LoginWindow.xaml">
+    <Compile Include="RestGroupsPage.cs" />
+    <Compile Include="Models\User.cs" />
+    <Page Include="Views\LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -84,10 +87,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LoginWindow.xaml.cs">
+    <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>

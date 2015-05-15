@@ -13,8 +13,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using AddressBooks.Models;
+using AddressBooks.Views;
 
-namespace AddressBooks
+namespace AddressBooks.Views
 {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml
@@ -33,6 +35,33 @@ namespace AddressBooks
             {
                 {"username", Username.Text},
                 {"password", Password.Password}
+            };
+            try
+            {
+                await RestApi.PopulateApiToken(body);
+                User user = await RestApi.GetCurrentUser();
+                new MainWindow(user).Show();
+                this.Close();
+            }
+            catch (ApiException ex)
+            {
+                if (ex.Content == @"{""non_field_errors"":[""Unable to log in with provided credentials.""]}")
+                {
+                    MessageBox.Show("Error al iniciar sesion. Usuario o contraseña incorrectos.");
+                }
+                else
+                {
+                    MessageBox.Show("Error inesperado al inciar sesion. Intentelo de nuevo mas tarde.");
+                }
+            }
+        }
+
+        private async void Button_Initialized(object sender, EventArgs e)
+        {
+            var body = new Dictionary<string, string>()
+            {
+                {"username", "admin"},
+                {"password", "12481632a"}
             };
             try
             {
