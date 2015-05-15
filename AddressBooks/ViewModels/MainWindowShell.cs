@@ -7,7 +7,7 @@ using Stylet;
 
 namespace AddressBooks.ViewModels
 {
-    class MainWindowShell : Conductor
+    class MainWindowShell
     {
     }
 }

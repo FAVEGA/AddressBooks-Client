@@ -1,8 +1,13 @@
 ﻿<Application x:Class="AddressBooks.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="LoginWindow.xaml">
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:local="clr-namespace:AddressBooks.ViewModels">
     <Application.Resources>
-         
+        <s:ApplicationLoader>
+            <s:ApplicationLoader.Bootstrapper>
+                <local:LoginBootstrapper/>
+            </s:ApplicationLoader.Bootstrapper>
+        </s:ApplicationLoader>
     </Application.Resources>
 </Application>
