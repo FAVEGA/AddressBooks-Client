@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AddressBooks.ViewModels
 {
-    class MainWindowBootstrapper : Bootstrapper<MainWindowShell>
+    class MainWindowBootstrapper : Bootstrapper<MainShell>
     {
     }
 }

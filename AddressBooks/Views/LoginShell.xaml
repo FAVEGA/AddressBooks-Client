@@ -23,7 +23,7 @@
 
         <Label Grid.Row="2" Grid.Column="0" Content="Contraseña:" HorizontalAlignment="Right"/>
         <PasswordBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" x:Name="Password" xaml:Secure.Password="{Binding Password, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <Button Content="Iniciar sesion" Margin="10,10,4,10" Grid.Row="3" Grid.ColumnSpan="2" Command="{s:Action Login}"/>
+
+        <Button Content="Iniciar sesion" Margin="10,10,4,10" Grid.Row="3" Grid.ColumnSpan="2" IsDefault="True" Command="{s:Action Login}"/>
     </Grid>
 </Window>

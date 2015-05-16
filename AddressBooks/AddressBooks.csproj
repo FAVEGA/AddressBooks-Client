@@ -74,16 +74,17 @@
     <Compile Include="Models\Group.cs" />
     <Compile Include="IAddressBookApi.cs" />
     <Compile Include="RestAddressesPage.cs" />
-    <Compile Include="RestApi.cs" />
+    <Compile Include="AddressBooksApi.cs" />
     <Compile Include="RefitStubs.cs" />
     <Compile Include="RestGroupsPage.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="ViewModels\AddressesViewModel.cs" />
     <Compile Include="Xaml.cs" />
     <Page Include="Views\LoginShell.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow.xaml">
+    <Page Include="Views\MainShell.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -95,14 +96,11 @@
     <Compile Include="ViewModels\LoginBootstrapper.cs" />
     <Compile Include="ViewModels\LoginShell.cs" />
     <Compile Include="ViewModels\MainWindowBootstrapper.cs" />
-    <Compile Include="ViewModels\MainWindowShell.cs" />
-    <Compile Include="Views\LoginShell.xaml.cs">
-      <DependentUpon>LoginShell.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ViewModels\MainShell.cs" />
+    <Page Include="Views\AddressesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
