@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 
 namespace AddressBooks.ViewModels
 {
-    class LoginBootstrapper : Bootstrapper<LoginShell>
+    class PermissionsViewModel : Screen
     {
+        public PermissionsViewModel()
+        {
+            this.DisplayName = "Permisos";
+        }
     }
 }

@@ -68,18 +68,38 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Api\CachedAddressBooksApi.cs" />
+    <Compile Include="Api\IAddressBooksApi.cs" />
+    <Compile Include="Api\IRegistrar.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\AddressBook.cs" />
-    <Compile Include="RestAddressBookPage.cs" />
+    <Compile Include="Rest\RestAddressBookPage.cs" />
     <Compile Include="Models\Group.cs" />
-    <Compile Include="IAddressBookApi.cs" />
-    <Compile Include="RestAddressesPage.cs" />
-    <Compile Include="AddressBooksApi.cs" />
+    <Compile Include="Rest\IRestAddressBookApi.cs" />
+    <Compile Include="Rest\RestAddressesPage.cs" />
     <Compile Include="RefitStubs.cs" />
-    <Compile Include="RestGroupsPage.cs" />
+    <Compile Include="Rest\RestGroupsPage.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="ViewModels\AddressBooksViewModel.cs" />
     <Compile Include="ViewModels\AddressesViewModel.cs" />
-    <Compile Include="Xaml.cs" />
+    <Compile Include="ViewModels\GroupsViewModel.cs" />
+    <Compile Include="Api\IRegisterable.cs" />
+    <Compile Include="ViewModels\LoginShellBootstrapper.cs" />
+    <Compile Include="ViewModels\PermissionsViewModel.cs" />
+    <Compile Include="ViewModels\UsersViewModel.cs" />
+    <Compile Include="Utils\Xaml.cs" />
+    <Page Include="Views\AddressBooksView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AddressesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GroupsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LoginShell.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -92,12 +112,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ViewModels\AddressesScreen.cs" />
-    <Compile Include="ViewModels\LoginBootstrapper.cs" />
     <Compile Include="ViewModels\LoginShell.cs" />
-    <Compile Include="ViewModels\MainWindowBootstrapper.cs" />
+    <Compile Include="ViewModels\MainShellBootstrapper.cs" />
     <Compile Include="ViewModels\MainShell.cs" />
-    <Page Include="Views\AddressesView.xaml">
+    <Page Include="Views\PermissionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UsersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,9 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="StyletReadme.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,7 +6,7 @@
     <Application.Resources>
         <s:ApplicationLoader>
             <s:ApplicationLoader.Bootstrapper>
-                <local:LoginBootstrapper/>
+                <local:LoginShellBootstrapper/>
             </s:ApplicationLoader.Bootstrapper>
         </s:ApplicationLoader>
     </Application.Resources>

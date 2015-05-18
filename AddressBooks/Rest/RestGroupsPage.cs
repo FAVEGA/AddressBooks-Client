@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AddressBooks.Models;
 
-namespace AddressBooks
+namespace AddressBooks.Rest
 {
-    public class RestAddressesPage
+    public class RestGroupsPage
     {
         [JsonProperty("count")]
         public int Count { get; set; }
@@ -20,7 +20,6 @@ namespace AddressBooks
         public string Previous { get; set; }
 
         [JsonProperty("results")]
-        public List<Address> Results;
+        public List<Group> Results;
     }
 }
-

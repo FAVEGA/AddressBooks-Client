@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AddressBooks
+namespace AddressBooks.Rest
 {
-    public interface IAddressBookApi
+    public interface IRestAddressBookApi
     {
         [Post("/api-token-auth/")]
         Task<Dictionary<string, string>> CreateApiToken([Body] Dictionary<string, string> user);

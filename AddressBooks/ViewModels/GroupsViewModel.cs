@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 
 namespace AddressBooks.ViewModels
 {
-    class MainWindowBootstrapper : Bootstrapper<MainShell>
+    class GroupsViewModel : Screen
     {
+        public GroupsViewModel()
+        {
+            this.DisplayName = "Grupos";
+        }
     }
 }

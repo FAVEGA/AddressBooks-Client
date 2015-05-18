@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="AddressBooks.Views.GroupsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Background="#FFE5E5E5">
+        <Label Content="Libreta:" Margin="42,13,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="54"/>
+        <ComboBox Margin="96,15,10,0" VerticalAlignment="Top"/>
+        <Label Content="Nuevo grupo: " HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top" Width="86"/>
+        <TextBox Margin="96,46,90,0" VerticalAlignment="Top" Height="22"/>
+        <Button Content="Crear grupo" Margin="0,46,10,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Right" Width="75"/>
+        <Label Content="Grupos:" HorizontalAlignment="Left" Margin="40,73,0,0" VerticalAlignment="Top" Width="56"/>
+        <ListBox Margin="96,73,10,35"/>
+        <Button Content="Guardar" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
+        <Button Content="Eliminar" Margin="0,0,90,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
+    </Grid>
+</UserControl>
