@@ -167,7 +167,7 @@ namespace AddressBooks.ViewModels
             AddressBooksSelectionChanged();
         }
 
-        public async void MoveUserToSharedWith()
+        public void MoveUserToSharedWith()
         {
             if (AddressBook != null && NotSharedWithSelectedUser != null)
             {
@@ -177,7 +177,7 @@ namespace AddressBooks.ViewModels
             }
         }
 
-        public async void MoveUserToNotSharedWith()
+        public void MoveUserToNotSharedWith()
         {
             if (AddressBook != null && SharedWithSelectedUser != null)
             {

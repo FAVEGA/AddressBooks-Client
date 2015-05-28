@@ -107,7 +107,7 @@ namespace AddressBooks.ViewModels
             SelectedAddresses = new BindableCollection<AddressViewModel>();
         }
 
-        public async void AddressesSelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void AddressesSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DataGrid dataGrid = sender as DataGrid;
             SelectedAddresses.Clear();

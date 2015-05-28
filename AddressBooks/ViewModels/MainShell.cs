@@ -13,12 +13,12 @@ namespace AddressBooks.ViewModels
     class MainShell : Conductor<IScreen>.Collection.OneActive
     {
 
-        private readonly IAddressBooksApi addressBooksApi;
+        private readonly IAddressBooksApi _addressBooksApi;
 
         public MainShell(IAddressBooksApi addressBooksApi, AddressesPage addressesViewModel, GroupsPage groupsViewModel,
             AddressBooksPage addressBooksViewModel)
         {
-            this.addressBooksApi = addressBooksApi;
+            this._addressBooksApi = addressBooksApi;
             this.NotifyDataSetCanUpdate(null);
             this.Items.Add(addressesViewModel);
             this.Items.Add(groupsViewModel);
@@ -30,12 +30,12 @@ namespace AddressBooks.ViewModels
 
         Timer _dataSetUpdateTimer;
 
-        public void Deactivated()
+        public new void Deactivated()
         {
             _dataSetUpdateTimer = new Timer(NotifyDataSetCanUpdate, null, TimeSpan.Zero, TimeSpan.FromMinutes(0.5));
         }
 
-        public void Activated()
+        public new void Activated()
         {
             if (_dataSetUpdateTimer != null)
             {
@@ -45,7 +45,7 @@ namespace AddressBooks.ViewModels
 
         public void NotifyDataSetCanUpdate(object state)
         {
-            ((CachedAddressBooksApi) addressBooksApi).NotifyCanUpdate();
+            ((CachedAddressBooksApi) _addressBooksApi).NotifyCanUpdate();
         }
     }
 }
