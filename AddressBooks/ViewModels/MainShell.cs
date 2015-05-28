@@ -13,43 +13,38 @@ namespace AddressBooks.ViewModels
     class MainShell : Conductor<IScreen>.Collection.OneActive
     {
 
-        public IObservableCollection<AddressBook> AddressBooks { get; private set; }
-        private IAddressBooksApi addressBooksApi;
+        private readonly IAddressBooksApi addressBooksApi;
 
-        public MainShell(IAddressBooksApi addressBooksApi)
+        public MainShell(IAddressBooksApi addressBooksApi, AddressesPage addressesViewModel, GroupsPage groupsViewModel,
+            AddressBooksPage addressBooksViewModel)
         {
             this.addressBooksApi = addressBooksApi;
             this.NotifyDataSetCanUpdate(null);
-            this.Items.Add(new AddressesViewModel());
-            this.Items.Add(new GroupsViewModel());
-            this.Items.Add(new AddressBooksViewModel());
-            this.Items.Add(new UsersViewModel());
-            this.Items.Add(new PermissionsViewModel());
+            this.Items.Add(addressesViewModel);
+            this.Items.Add(groupsViewModel);
+            this.Items.Add(addressBooksViewModel);
 
-            this.ActiveItem = this.Items.First();
+            this.ActiveItem = addressesViewModel;
         }
 
 
-        Timer DataSetUpdateTimer;
+        Timer _dataSetUpdateTimer;
 
         public void Deactivated()
         {
-            DataSetUpdateTimer = new Timer(NotifyDataSetCanUpdate, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            Console.WriteLine("Deactivated, started timer...");
+            _dataSetUpdateTimer = new Timer(NotifyDataSetCanUpdate, null, TimeSpan.Zero, TimeSpan.FromMinutes(0.5));
         }
 
         public void Activated()
         {
-            Console.WriteLine("Activated, disposing timer...");
-            if (DataSetUpdateTimer != null)
+            if (_dataSetUpdateTimer != null)
             {
-                DataSetUpdateTimer.Dispose();
+                _dataSetUpdateTimer.Dispose();
             }
         }
 
         public void NotifyDataSetCanUpdate(object state)
         {
-            Console.WriteLine("Called NotifyDataSetCanUpdate");
             ((CachedAddressBooksApi) addressBooksApi).NotifyCanUpdate();
         }
     }

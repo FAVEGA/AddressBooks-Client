@@ -20,7 +20,7 @@ namespace AddressBooks.Rest
         public string Previous { get; set; }
 
         [JsonProperty("results")]
-        public List<Address> Results;
+        public List<RestAddress> Results;
     }
 }
 

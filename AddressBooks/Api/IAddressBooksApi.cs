@@ -11,20 +11,24 @@ namespace AddressBooks.Api
     {
         List<AddressBook> GetAddressBooks();
         AddressBook GetAddressBook(int id);
-        void CreateAddressBook(AddressBook addressBook);
-        void DeleteAddressBook(AddressBook addressBook);
-        void UpdateAddressBook(AddressBook addressBook);
+        Task<AddressBook> CreateAddressBook(AddressBook addressBook);
+        Task DeleteAddressBook(AddressBook addressBook);
+        Task ChangeAddressBook(AddressBook addressBook);
 
         List<Group> GetGroups();
         Group GetGroup(int id);
-        void CreateGroup(Group group);
-        void DeleteGroup(Group group);
-        void UpdateGroup(Group group);
+        Task<Group> CreateGroup(Group group);
+        Task DeleteGroup(Group group);
+        Task ChangeGroup(Group group);
 
         List<Address> GetAddresses();
         Address GetAddress(int id);
-        void CreateAddress(Address address);
-        void DeleteAddress(Address address);
-        void UpdateAddress(Address address);
+        Address GetAddress(string email, int addressBookId);
+        Task<Address> CreateAddress(Address address);
+        Task DeleteAddress(Address address);
+        Task ChangeAddress(Address address);
+
+        List<User> GetUsers();
+        User GetUser(int id);
     }
 }

@@ -10,17 +10,11 @@ namespace AddressBooks.Models
 
     public class AddressBook
     {
-        [JsonProperty("id")]
         public int Id { get; set; }
-
-        [JsonProperty("name")]
         public string Name { get; set; }
-
-        [JsonProperty("groups")]
-        public List<int> GroupIds { get; set; }
-
-        [JsonIgnore]
         public List<Group> Groups { get; set; }
+        public User Owner { get; set; }
+        public List<User> SharedWith { get; set; } 
 
         public override int GetHashCode()
         {

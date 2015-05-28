@@ -9,16 +9,28 @@ namespace AddressBooks.Models
 {
     public class Group
     {
-        [JsonProperty("id")]
-        public int Id;
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Address> Addresses { get; set; }
+        public AddressBook AddressBook { get; set; }
 
-        [JsonProperty("name")]
-        public string Name;
+        public override int GetHashCode()
+        {
+            return Id;
+        }
 
-        [JsonProperty("address_book")]
-        private int AddressBookId;
+        public override bool Equals(object obj)
+        {
+            if (obj is Group)
+            {
+                return ((Group)obj).Id == this.Id;
+            }
+            return base.Equals(obj);
+        }
 
-        [JsonProperty("ignore")]
-        public List<Address> Addresses;
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }

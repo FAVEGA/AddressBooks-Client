@@ -53,5 +53,24 @@ namespace AddressBooks.Models
 
         [JsonProperty("can_assign_permissions")]
         public bool CanAssignPermissions;
+
+        public override string ToString()
+        {
+            return Username;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is User)
+            {
+                return ((User)obj).Id == this.Id;
+            }
+            return base.Equals(obj);
+        }
     }
 }

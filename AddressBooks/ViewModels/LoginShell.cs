@@ -19,13 +19,13 @@ namespace AddressBooks.ViewModels
         
 
         private readonly IWindowManager windowManager;
-        private IAddressBooksApi addressBooksApi;
+        private IAuthenticatedAddressBooksApi addressBooksApi;
 
         public string Username { get; set; }
 
         public string Password{ get; set; }
 
-        public LoginShell(IWindowManager windowManager, IAddressBooksApi addressBooksApi)
+        public LoginShell(IWindowManager windowManager, IAuthenticatedAddressBooksApi addressBooksApi)
         {
             this.windowManager = windowManager;
             this.addressBooksApi = addressBooksApi;
@@ -33,16 +33,10 @@ namespace AddressBooks.ViewModels
 
         public async void Login()
         {
-            var body = new Dictionary<string, string>()
-            {
-                {"username", Username},
-                {"password", Password}
-            };
             try
             {
-                await ((CachedAddressBooksApi) this.addressBooksApi).PopulateApiToken(body);
-                User user = await ((CachedAddressBooksApi)this.addressBooksApi).GetCurrentUser();
-                windowManager.ShowWindow(new MainShell(addressBooksApi));
+                await this.addressBooksApi.Authenticate(Username, Password);
+                User user = await ((CachedAddressBooksApi)this.addressBooksApi).GetLoggedInUser();
                 this.RequestClose();
                 
             }
@@ -55,6 +49,7 @@ namespace AddressBooks.ViewModels
                 else
                 {
                     windowManager.ShowMessageBox("Error inesperado al inciar sesion. Intentelo de nuevo mas tarde.");
+                    Console.WriteLine(ex.Message);
                 }
             }
         }

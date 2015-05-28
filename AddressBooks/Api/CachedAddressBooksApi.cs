@@ -1,83 +1,144 @@
-﻿using AddressBooks.Models;
-using AddressBooks.Rest;
-using AddressBooks.ViewModels;
-using Refit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AddressBooks.Models;
+using AddressBooks.Properties;
+using AddressBooks.Rest;
+using Newtonsoft.Json;
+using Refit;
+using Group = AddressBooks.Models.Group;
 
 namespace AddressBooks.Api
 {
-    class CachedAddressBooksApi : IAddressBooksApi, IRegistrar
+    class CachedAddressBooksApi : IAuthenticatedAddressBooksApi, IRegistrar, IUpdatable
     {
 
-        private string Token;
-        private IRestAddressBookApi Api = RestService.For<IRestAddressBookApi>("http://addressbooks.favega.com/");
-        private List<AddressBook> Cache = new List<AddressBook>();
-        private DateTime LastUpdate;
-        private List<IRegisterable> Registerables = new List<IRegisterable>();
+        private string _token;
+        private IRestAddressBookApi _api;
+        private List<AddressBook> _addressBooksCache = new List<AddressBook>();
+        private List<User> _usersCache = new List<User>(); 
+        private DateTime _lastChange;
+        private readonly List<IRegisterable> _registerables = new List<IRegisterable>();
+
+        public CachedAddressBooksApi()
+        {
+            _api = RestService.For<IRestAddressBookApi>("http://addressbooks.favega.com/");
+        }
 
         public List<AddressBook> GetAddressBooks()
         {
-            return Cache;
+            return _addressBooksCache;
         }
 
         public AddressBook GetAddressBook(int id)
         {
-            return Cache.Find(o => o.Id == id);
+            if (_addressBooksCache.Find(o => o.Id == id) == null)
+            {
+                throw new Exception("Address book not found");
+            }
+            return _addressBooksCache.Find(o => o.Id == id);
         }
 
-        public void CreateAddressBook(AddressBook addressBook)
+        public async Task<AddressBook> CreateAddressBook(AddressBook addressBook)
         {
-            throw new NotImplementedException();
+            var restAddressBook = new RestAddressBook
+            {
+                Name = addressBook.Name,
+                OwnerId = addressBook.Owner.Id,
+                SharedWithIds = addressBook.SharedWith.Select(user => user.Id).ToList(),
+                GroupIds = addressBook.Groups.Select(group => group.Id).ToList(),
+            };
+            addressBook.Id = (await _api.CreateAddressBook(restAddressBook, "token " + _token)).Id;
+            _addressBooksCache.Add(addressBook);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Created address book " + addressBook.Id);
+            return addressBook;
         }
 
-        public void DeleteAddressBook(AddressBook addressBook)
+        public async Task DeleteAddressBook(AddressBook addressBook)
         {
-            throw new NotImplementedException();
+            await _api.DeleteAddressBook(addressBook.Id, "token " + _token);
+            _addressBooksCache.Remove(addressBook);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Deleted address book " + addressBook.Id);
         }
 
-        public void UpdateAddressBook(AddressBook addressBook)
+        public async Task ChangeAddressBook(AddressBook addressBook)
         {
-            throw new NotImplementedException();
+            _addressBooksCache.Remove(addressBook);
+            var restAddressBook = new RestAddressBook()
+            {
+                Id = addressBook.Id,
+                Name = addressBook.Name,
+                OwnerId = addressBook.Owner.Id,
+                SharedWithIds = addressBook.SharedWith.Select(user => user.Id).ToList(),
+                GroupIds = addressBook.Groups.Select(group => group.Id).ToList(),
+            };
+            await _api.ChangeAddressBook(addressBook.Id, restAddressBook, "token " + _token);
+            _addressBooksCache.Add(addressBook);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Changed address book " + addressBook.Id);
         }
 
         public List<Group> GetGroups()
         {
-            List<Group> groups = new List<Group>();
-            foreach (AddressBook addressBook in Cache)
-            {
-                groups.AddRange(addressBook.Groups);
-            }
+            var groups = _addressBooksCache.SelectMany(o => o.Groups).ToList();
             return groups;
         }
 
         public Group GetGroup(int id)
         {
-            return this.GetGroups().Find(o => o.Id == id);
+            if (GetGroups().Find(o => o.Id == id) == null)
+            {
+                throw new Exception("Group not found");
+            }
+            return GetGroups().Find(o => o.Id == id);
         }
 
-        public void CreateGroup(Group group)
+        public async Task<Group> CreateGroup(Group group)
         {
-            throw new NotImplementedException();
+            group.Id = (int) (await _api.CreateGroup(new RestGroup()
+            {
+                AddressBook = group.AddressBook.Id,
+                Name = group.Name,
+                Addresses = group.Addresses.Select(address => address.Id).ToList(),
+            }, "token " + _token)).Id;
+            _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Add(group);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Created group " + group.Id);
+            return group;
         }
 
-        public void DeleteGroup(Group group)
+        public async Task DeleteGroup(Group group)
         {
-            throw new NotImplementedException();
+            await _api.DeleteGroup(group.Id, "token " + _token);
+            _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Remove(group);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Deleted group " + group.Id);
         }
 
-        public void UpdateGroup(Group group)
+        public async Task ChangeGroup(Group group)
         {
-            throw new NotImplementedException();
+            _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Remove(group);
+            var restGroup = new RestGroup()
+            {
+                Id = group.Id,
+                Name = group.Name,
+                AddressBook = group.AddressBook.Id,
+                Addresses = group.Addresses.Select(o => o.Id).ToList(),
+            };
+            await _api.ChangeGroup(group.Id, restGroup, "token " + _token);
+            _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Add(group);
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Changed group " + group.Id);
         }
 
         public List<Address> GetAddresses()
         {
             List<Address> addresses = new List<Address>();
-            foreach (Group group in this.GetGroups())
+            foreach (Group group in GetGroups())
             {
                 addresses.AddRange(group.Addresses);
             }
@@ -86,119 +147,265 @@ namespace AddressBooks.Api
 
         public Address GetAddress(int id)
         {
-            return this.GetAddresses().Find(o => o.Id == id);
-        }
-
-        public void CreateAddress(Address address)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteAddress(Address address)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateAddress(Address address)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async void PopulateAddressBooks()
-        {
-            Console.WriteLine("Populating address books...");
-            Cache = new List<AddressBook>();
-
-            RestAddressBookPage addressBooksPage = await Api.GetAddressBooks(1, "token " + Token);
-            foreach (AddressBook addressBook in addressBooksPage.Results)
+            if (GetAddresses().Find(o => o.Id == id) == null)
             {
-                Cache.Add(await PopulateAddressBookWithGroups(addressBook));
+                throw new Exception("Address not found");
+            }
+            return GetAddresses().Find(o => o.Id == id);
+        }
+
+        public Address GetAddress(string email, int addressBookId)
+        {
+            return
+                _addressBooksCache.Find(o => o.Id == addressBookId)
+                    .Groups.SelectMany(o => o.Addresses)
+                    .ToList()
+                    .Find(o => o.Email == email);
+        }
+
+        public async Task<Address> CreateAddress(Address address)
+        {
+            address.Id = (await _api.CreateAddress(new RestAddress()
+            {
+                Name = address.Name,
+                Email = address.Email,
+                GroupIds = address.Groups.Select(o => o.Id).ToList()
+            }, "token " + _token)).Id;
+            foreach (AddressBook addressBook in _addressBooksCache)
+            {
+                foreach (Group group in addressBook.Groups)
+                {
+                    if (address.Groups.Contains(group))
+                    {
+                        group.Addresses.Remove(address);
+                        group.Addresses.Add(address);
+                    }
+                }
+            }
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Created address " + address.Id);
+            return address;
+        }
+
+        public async Task DeleteAddress(Address address)
+        {
+            await _api.DeleteAddress(address.Id, "token " + _token);
+            _addressBooksCache.ForEach(a => a.Groups.ForEach(g => g.Addresses.Remove(g.Addresses.Find(o => o.Id == address.Id))));
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Deleted address " + address.Id);
+        }
+
+        public async Task ChangeAddress(Address address)
+        {
+            await _api.ChangeAddress(address.Id, new RestAddress()
+            {
+                Id = address.Id,
+                Name = address.Name,
+                Email = address.Email,
+                GroupIds = address.Groups.Select(o => o.Id).ToList()
+            }, "token " + _token);
+
+            _addressBooksCache.SelectMany(o => o.Groups).ToList().ForEach(o => o.Addresses.Remove(o.Addresses.Find(a => a.Id == address.Id)));
+
+            foreach (var @group in address.Groups)
+            {
+                group.Addresses.Add(address);
+            }
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
+            Log("Changed address " + address.Id);
+        }
+
+        private async Task PopulateUsers()
+        {
+            _usersCache = new List<User>();
+
+            RestUsersPage restUsersPage = await _api.GetUsers(1, "token " + _token);
+            foreach (var user in restUsersPage.Results)
+            {
+                _usersCache.Add(user);
+            }
+
+            while (restUsersPage.Next != null)
+            {
+                foreach (var user in restUsersPage.Results)
+                {
+                    _usersCache.Add(user);
+                }
+                restUsersPage = await _api.GetUsers(GetNextPageNumberFromUrl(restUsersPage.Next), "token " + _token);
+            }
+        }
+
+        private async Task PopulateAddressBooks()
+        {
+            _addressBooksCache = new List<AddressBook>();
+
+            RestAddressBookPage addressBooksPage = await _api.GetAddressBooks(1, "token " + _token);
+            foreach (RestAddressBook restAddressBook in addressBooksPage.Results)
+            {
+                var addressBook = new AddressBook
+                {
+                    Id = restAddressBook.Id,
+                    Name = restAddressBook.Name,
+                    Owner = GetUser(restAddressBook.OwnerId),
+                    SharedWith = restAddressBook.SharedWithIds.Select(GetUser).ToList()
+                };
+                _addressBooksCache.Add(addressBook);
+                addressBook = await PopulateAddressBookWithGroups(addressBook.Id);
+                _addressBooksCache.Remove(_addressBooksCache.Find(o => o.Id == addressBook.Id));
+                _addressBooksCache.Add(addressBook);
             }
 
             while (addressBooksPage.Next != null)
             {
-                foreach (AddressBook addressBook in addressBooksPage.Results)
+                addressBooksPage = await _api.GetAddressBooks(GetNextPageNumberFromUrl(addressBooksPage.Next), "token " + _token);
+                foreach (RestAddressBook restAddressBook in addressBooksPage.Results)
                 {
-                    Cache.Add(await PopulateAddressBookWithGroups(addressBook));
+                    var addressBook = new AddressBook
+                    {
+                        Id = restAddressBook.Id,
+                        Name = restAddressBook.Name
+                    };
+                    _addressBooksCache.Add(addressBook);
+                    addressBook = await PopulateAddressBookWithGroups(addressBook.Id);
+                    _addressBooksCache.Remove(_addressBooksCache.Find(o => o.Id == addressBook.Id));
+                    _addressBooksCache.Add(addressBook);
                 }
-                addressBooksPage = await Api.GetAddressBooks(GetNextPageNumberFromUrl(addressBooksPage.Next), "token " + Token);
             }
         }
 
-        private async Task<AddressBook> PopulateAddressBookWithGroups(AddressBook addressBook)
+        private async Task<AddressBook> PopulateAddressBookWithGroups(int addressBookId)
         {
+            var addressBook = GetAddressBook(addressBookId);
             addressBook.Groups = new List<Group>();
 
-            RestGroupsPage groupsPage = await Api.GetGroupsForAddressBook(addressBook.Id, 1, "token " + Token);
-            foreach (Group group in groupsPage.Results)
+            RestGroupsPage groupsPage = await _api.GetGroupsForAddressBook(addressBook.Id, 1, "token " + _token);
+            foreach (RestGroup group in groupsPage.Results)
             {
-                addressBook.Groups.Add(await PopulateGroupWithAddresses(group));
+                var newGroup = new Group()
+                {
+                    Id = group.Id,
+                    AddressBook = addressBook,
+                    Name = group.Name,
+                };
+                addressBook.Groups.Add(newGroup);
             }
 
             while (groupsPage.Next != null)
             {
-                foreach (Group group in groupsPage.Results)
+                groupsPage = await _api.GetGroupsForAddressBook(addressBook.Id, GetNextPageNumberFromUrl(groupsPage.Next), "token " + _token);
+                foreach (RestGroup group in groupsPage.Results)
                 {
-                    addressBook.Groups.Add(await PopulateGroupWithAddresses(group));
+                    var newGroup = new Group()
+                    {
+                        Id = group.Id,
+                        AddressBook = addressBook,
+                        Name = group.Name,
+                    };
+                    addressBook.Groups.Add(newGroup);
                 }
-                groupsPage = await Api.GetGroupsForAddressBook(addressBook.Id, GetNextPageNumberFromUrl(groupsPage.Next), "token " + Token);
+            }
+
+            // Now that all groups have been added, populate them
+            foreach (var @group in addressBook.Groups.ToList())
+            {
+                var newGroup = await PopulateGroupWithAddresses(group.Id);
+                addressBook.Groups.Remove(newGroup);
+                addressBook.Groups.Add(newGroup);
             }
             return addressBook;
         }
 
-        private async Task<Group> PopulateGroupWithAddresses(Group group)
+        private async Task<Group> PopulateGroupWithAddresses(int groupId)
         {
+            var group = GetGroup(groupId);
             group.Addresses = new List<Address>();
-            RestAddressesPage addressesPage = await Api.GetAddressesForGroup(group.Id, 1, "token " + Token);
-            foreach (Address address in addressesPage.Results)
+            RestAddressesPage addressesPage = await _api.GetAddressesForGroup(group.Id, 1, "token " + _token);
+            foreach (RestAddress address in addressesPage.Results)
             {
-                group.Addresses.Add(address);
+                var newAddress = new Address()
+                {
+                    Id = address.Id,
+                    Name = address.Name,
+                    Groups = address.GroupIds.Select(GetGroup).ToList(),
+                    Email = address.Email,
+                };
+                group.Addresses.Add(newAddress);
             }
 
             while (addressesPage.Next != null)
             {
-                foreach (Address address in addressesPage.Results)
+                addressesPage = await _api.GetAddressesForGroup(group.Id, GetNextPageNumberFromUrl(addressesPage.Next), "token " + _token);
+                foreach (RestAddress address in addressesPage.Results)
                 {
-                    group.Addresses.Add(address);
+                    var newAddress = new Address()
+                    {
+                        Id = address.Id,
+                        Name = address.Name,
+                        Groups = address.GroupIds.Select(GetGroup).ToList(),
+                        Email = address.Email,
+                    };
+                    group.Addresses.Add(newAddress);
                 }
-                addressesPage = await Api.GetAddressesForGroup(group.Id, GetNextPageNumberFromUrl(addressesPage.Next), "token " + Token);
             }
             return group;
         }
 
         private int GetNextPageNumberFromUrl(string url)
         {
-            return Convert.ToInt32(System.Text.RegularExpressions.Regex.Match(url, @"\/\?page=(\d+)$",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase).Groups[1].Value);
+            return Convert.ToInt32(Regex.Match(url, @"[\?&]page=(\d+)$",
+                RegexOptions.IgnoreCase).Groups[1].Value);
         }
 
-        public async Task PopulateApiToken(Dictionary<string, string> user)
+        public void SetToken(string token)
         {
-            this.Token = (await Api.CreateApiToken(user))["token"];
+            _token = token;
         }
 
-        public async Task<User> GetCurrentUser()
+        public async Task<User> GetLoggedInUser()
         {
-            var user = await Api.GetCurrentUser("token " + this.Token);
-            user.Token = this.Token;
+            var user = await _api.GetCurrentUser("token " + _token);
+            user.Token = _token;
             return user;
         }
 
-        public void NotifyCanUpdate()
+        public async void NotifyCanUpdate()
         {
-            if (LastUpdate == null || DateTime.Now.Subtract(LastUpdate).TotalMinutes > 5)
-            {
-                Console.WriteLine("Updating data set...");
-                this.LastUpdate = DateTime.Now;
-                this.PopulateAddressBooks();
-                Registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
-                Console.WriteLine("Done.");
-            }
+            if (DateTime.Now.Subtract(_lastChange).TotalMinutes < 0.3) return;
+            _lastChange = DateTime.Now;
+            Log("Updating data...");
+            await PopulateUsers();
+            await PopulateAddressBooks();
+            _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
         }
 
         public void Register(IRegisterable registerable)
         {
-            this.Registerables.Add(registerable);
+            Console.WriteLine("Registered " + registerable);
+            _registerables.Add(registerable);
+        }
+
+        public async Task Authenticate(string username, string password)
+        {
+            SetToken((await _api.CreateApiToken(new Dictionary<string, string>
+            {
+                {"username", username},
+                {"password", password}
+            }))["token"]);
+        }
+
+        public List<User> GetUsers()
+        {
+            return _usersCache;
+        }
+
+        public User GetUser(int id)
+        {
+            return _usersCache.Find(o => o.Id == id);
+        }
+
+        private void Log(string message)
+        {
+            Console.WriteLine("CachedAddressBooksApi: " + message);
         }
     }
 }
