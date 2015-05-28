@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -127,7 +127,7 @@ namespace AddressBooks.ViewModels
                 MessageBoxViewModel.ButtonLabels[MessageBoxResult.Yes] = "Del grupo";
                 MessageBoxViewModel.ButtonLabels[MessageBoxResult.No] = "De la libreta";
                 MessageBoxViewModel.ButtonLabels[MessageBoxResult.Cancel] = "Cancelar";
-                var result = _windowManager.ShowMessageBox("De donde quiere eliminar las libretas seleccionadas?", "Eliminar direcciones", buttons: MessageBoxButton.YesNoCancel);
+                var result = _windowManager.ShowMessageBox("De donde quiere eliminar las libretas seleccionadas?", "Eliminar direcciones", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Yes)
                 {
                     var temp = SelectedAddresses.ToList();
@@ -175,7 +175,7 @@ namespace AddressBooks.ViewModels
                     mailto += selectedAddress.Email + ", ";
                     i++;
                 }
-                System.Diagnostics.Process.Start(mailto);
+                Process.Start(mailto);
                 Console.WriteLine("Sent email to " + i + " recipients");
                 Console.WriteLine(mailto);
             }

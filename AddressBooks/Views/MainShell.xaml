@@ -5,8 +5,6 @@
         xmlns:xaml="clr-namespace:Stylet.ModelValidation.Xaml"
         xmlns:Views="clr-namespace:AddressBooks.Views"
         Title="Libretas de direcciones FAVEGA"
-        Deactivated="{s:Action Deactivated}"
-        Activated="{s:Action Activated}"
         Height="346" Width="600" MinHeight="350" MinWidth="700">
     <Grid>
         <TabControl Style="{StaticResource StyletConductorTabControl}"/>

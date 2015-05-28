@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AddressBooks.Models;
-using AddressBooks.Properties;
 using AddressBooks.Rest;
-using Newtonsoft.Json;
 using Refit;
 using Group = AddressBooks.Models.Group;
 
@@ -48,7 +46,7 @@ namespace AddressBooks.Api
                 Name = addressBook.Name,
                 OwnerId = addressBook.Owner.Id,
                 SharedWithIds = addressBook.SharedWith.Select(user => user.Id).ToList(),
-                GroupIds = addressBook.Groups.Select(group => group.Id).ToList(),
+                GroupIds = addressBook.Groups.Select(group => group.Id).ToList()
             };
             addressBook.Id = (await _api.CreateAddressBook(restAddressBook, "token " + _token)).Id;
             _addressBooksCache.Add(addressBook);
@@ -68,13 +66,13 @@ namespace AddressBooks.Api
         public async Task ChangeAddressBook(AddressBook addressBook)
         {
             _addressBooksCache.Remove(addressBook);
-            var restAddressBook = new RestAddressBook()
+            var restAddressBook = new RestAddressBook
             {
                 Id = addressBook.Id,
                 Name = addressBook.Name,
                 OwnerId = addressBook.Owner.Id,
                 SharedWithIds = addressBook.SharedWith.Select(user => user.Id).ToList(),
-                GroupIds = addressBook.Groups.Select(group => group.Id).ToList(),
+                GroupIds = addressBook.Groups.Select(group => group.Id).ToList()
             };
             await _api.ChangeAddressBook(addressBook.Id, restAddressBook, "token " + _token);
             _addressBooksCache.Add(addressBook);
@@ -99,11 +97,11 @@ namespace AddressBooks.Api
 
         public async Task<Group> CreateGroup(Group group)
         {
-            group.Id = (int) (await _api.CreateGroup(new RestGroup()
+            group.Id = (await _api.CreateGroup(new RestGroup
             {
-                AddressBook = group.AddressBook.Id,
-                Name = group.Name,
-                Addresses = group.Addresses.Select(address => address.Id).ToList(),
+                AddressBook = @group.AddressBook.Id,
+                Name = @group.Name,
+                Addresses = @group.Addresses.Select(address => address.Id).ToList()
             }, "token " + _token)).Id;
             _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Add(group);
             _registerables.ForEach(registerable => registerable.NotifyDataSetChanged());
@@ -122,12 +120,12 @@ namespace AddressBooks.Api
         public async Task ChangeGroup(Group group)
         {
             _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Remove(group);
-            var restGroup = new RestGroup()
+            var restGroup = new RestGroup
             {
                 Id = group.Id,
                 Name = group.Name,
                 AddressBook = group.AddressBook.Id,
-                Addresses = group.Addresses.Select(o => o.Id).ToList(),
+                Addresses = group.Addresses.Select(o => o.Id).ToList()
             };
             await _api.ChangeGroup(group.Id, restGroup, "token " + _token);
             _addressBooksCache.Find(o => o.Id == group.AddressBook.Id).Groups.Add(group);
@@ -165,7 +163,7 @@ namespace AddressBooks.Api
 
         public async Task<Address> CreateAddress(Address address)
         {
-            address.Id = (await _api.CreateAddress(new RestAddress()
+            address.Id = (await _api.CreateAddress(new RestAddress
             {
                 Name = address.Name,
                 Email = address.Email,
@@ -197,7 +195,7 @@ namespace AddressBooks.Api
 
         public async Task ChangeAddress(Address address)
         {
-            await _api.ChangeAddress(address.Id, new RestAddress()
+            await _api.ChangeAddress(address.Id, new RestAddress
             {
                 Id = address.Id,
                 Name = address.Name,
@@ -281,11 +279,11 @@ namespace AddressBooks.Api
             RestGroupsPage groupsPage = await _api.GetGroupsForAddressBook(addressBook.Id, 1, "token " + _token);
             foreach (RestGroup group in groupsPage.Results)
             {
-                var newGroup = new Group()
+                var newGroup = new Group
                 {
                     Id = group.Id,
                     AddressBook = addressBook,
-                    Name = group.Name,
+                    Name = group.Name
                 };
                 addressBook.Groups.Add(newGroup);
             }
@@ -295,11 +293,11 @@ namespace AddressBooks.Api
                 groupsPage = await _api.GetGroupsForAddressBook(addressBook.Id, GetNextPageNumberFromUrl(groupsPage.Next), "token " + _token);
                 foreach (RestGroup group in groupsPage.Results)
                 {
-                    var newGroup = new Group()
+                    var newGroup = new Group
                     {
                         Id = group.Id,
                         AddressBook = addressBook,
-                        Name = group.Name,
+                        Name = group.Name
                     };
                     addressBook.Groups.Add(newGroup);
                 }
@@ -322,12 +320,12 @@ namespace AddressBooks.Api
             RestAddressesPage addressesPage = await _api.GetAddressesForGroup(group.Id, 1, "token " + _token);
             foreach (RestAddress address in addressesPage.Results)
             {
-                var newAddress = new Address()
+                var newAddress = new Address
                 {
                     Id = address.Id,
                     Name = address.Name,
                     Groups = address.GroupIds.Select(GetGroup).ToList(),
-                    Email = address.Email,
+                    Email = address.Email
                 };
                 group.Addresses.Add(newAddress);
             }
@@ -337,12 +335,12 @@ namespace AddressBooks.Api
                 addressesPage = await _api.GetAddressesForGroup(group.Id, GetNextPageNumberFromUrl(addressesPage.Next), "token " + _token);
                 foreach (RestAddress address in addressesPage.Results)
                 {
-                    var newAddress = new Address()
+                    var newAddress = new Address
                     {
                         Id = address.Id,
                         Name = address.Name,
                         Groups = address.GroupIds.Select(GetGroup).ToList(),
-                        Email = address.Email,
+                        Email = address.Email
                     };
                     group.Addresses.Add(newAddress);
                 }

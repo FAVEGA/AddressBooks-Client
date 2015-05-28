@@ -2,10 +2,9 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AddressBooks.Models;
 using Refit;
-using System.Text;
-using System.Threading.Tasks;
 
 /* ******** Hey You! *********
  *

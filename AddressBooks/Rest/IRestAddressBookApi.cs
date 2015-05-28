@@ -1,10 +1,7 @@
-﻿using AddressBooks.Models;
-using Refit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AddressBooks.Models;
+using Refit;
 
 namespace AddressBooks.Rest
 {

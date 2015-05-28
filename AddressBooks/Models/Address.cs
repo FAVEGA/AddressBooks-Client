@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace AddressBooks.Models
 {
@@ -23,14 +18,14 @@ namespace AddressBooks.Models
         {
             if (obj is AddressBook)
             {
-                return ((AddressBook)obj).Id == this.Id;
+                return ((AddressBook)obj).Id == Id;
             }
             return base.Equals(obj);
         }
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
     }
 }

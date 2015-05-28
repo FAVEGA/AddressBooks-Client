@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AddressBooks.Models
 {
@@ -68,7 +63,7 @@ namespace AddressBooks.Models
         {
             if (obj is User)
             {
-                return ((User)obj).Id == this.Id;
+                return ((User)obj).Id == Id;
             }
             return base.Equals(obj);
         }

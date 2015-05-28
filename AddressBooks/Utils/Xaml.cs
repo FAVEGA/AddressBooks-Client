@@ -125,7 +125,7 @@ namespace Stylet.ModelValidation.Xaml
             DependencyProperty.RegisterAttached("SecurePassword", typeof(SecureString), typeof(Secure), new FrameworkPropertyMetadata(new SecureString(), HandleBoundSecurePasswordChanged)
             {
                 BindsTwoWayByDefault = true,
-                DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
 
 

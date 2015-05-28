@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Stylet;
 using System.Threading;
-using AddressBooks.Models;
 using AddressBooks.Api;
+using Stylet;
 
 namespace AddressBooks.ViewModels
 {
@@ -14,28 +9,30 @@ namespace AddressBooks.ViewModels
     {
 
         private readonly IAddressBooksApi _addressBooksApi;
+        private readonly IUpdatable _updatable;
 
-        public MainShell(IAddressBooksApi addressBooksApi, AddressesPage addressesViewModel, GroupsPage groupsViewModel,
+        public MainShell(IAddressBooksApi addressBooksApi, IUpdatable updatable, AddressesPage addressesViewModel, GroupsPage groupsViewModel,
             AddressBooksPage addressBooksViewModel)
         {
-            this._addressBooksApi = addressBooksApi;
-            this.NotifyDataSetCanUpdate(null);
-            this.Items.Add(addressesViewModel);
-            this.Items.Add(groupsViewModel);
-            this.Items.Add(addressBooksViewModel);
+            _updatable = updatable;
+            _addressBooksApi = addressBooksApi;
+            NotifyDataSetCanUpdate(null);
+            Items.Add(addressesViewModel);
+            Items.Add(groupsViewModel);
+            Items.Add(addressBooksViewModel);
 
-            this.ActiveItem = addressesViewModel;
+            ActiveItem = addressesViewModel;
         }
 
 
         Timer _dataSetUpdateTimer;
 
-        public new void Deactivated()
+        protected override void OnDeactivate()
         {
             _dataSetUpdateTimer = new Timer(NotifyDataSetCanUpdate, null, TimeSpan.Zero, TimeSpan.FromMinutes(0.5));
         }
 
-        public new void Activated()
+        protected override void OnActivate()
         {
             if (_dataSetUpdateTimer != null)
             {
@@ -45,7 +42,7 @@ namespace AddressBooks.ViewModels
 
         public void NotifyDataSetCanUpdate(object state)
         {
-            ((CachedAddressBooksApi) _addressBooksApi).NotifyCanUpdate();
+            _updatable.NotifyCanUpdate();
         }
     }
 }

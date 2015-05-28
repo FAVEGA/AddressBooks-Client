@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AddressBooks.Api;
+﻿using System.Collections.Generic;
 using AddressBooks.Models;
 
 namespace AddressBooks.ViewModels
@@ -81,14 +79,14 @@ namespace AddressBooks.ViewModels
         {
             if (obj is AddressViewModel)
             {
-                return ((AddressViewModel)obj).Id == this.Id;
+                return ((AddressViewModel)obj).Id == Id;
             }
             return base.Equals(obj);
         }
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
     }
 }

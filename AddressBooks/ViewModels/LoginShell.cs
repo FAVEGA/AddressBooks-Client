@@ -1,16 +1,8 @@
-﻿using AddressBooks.Api;
+﻿using System;
+using AddressBooks.Api;
 using AddressBooks.Models;
-using AddressBooks.Views;
 using Refit;
 using Stylet;
-using StyletIoC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace AddressBooks.ViewModels
 {
@@ -35,9 +27,9 @@ namespace AddressBooks.ViewModels
         {
             try
             {
-                await this.addressBooksApi.Authenticate(Username, Password);
-                User user = await ((CachedAddressBooksApi)this.addressBooksApi).GetLoggedInUser();
-                this.RequestClose();
+                await addressBooksApi.Authenticate(Username, Password);
+                User user = await ((CachedAddressBooksApi)addressBooksApi).GetLoggedInUser();
+                RequestClose();
                 
             }
             catch (ApiException ex)
